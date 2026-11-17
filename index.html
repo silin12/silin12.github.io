@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>更新日志 | Trojan Panel 自建栈</title>
+<meta name="description" content="Trojan Panel 自建 fork 栈的更新日志、版本对应关系、安装升级方式与已知问题。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230f6f5c'/><text x='16' y='23' font-size='19' font-family='monospace' fill='%23ffffff' text-anchor='middle'>T</text></svg>">
+<style>
+:root{
+  --paper:#f5f4f1;
+  --surface:#ffffff;
+  --ink:#15171a;
+  --ink-2:#4a5058;
+  --ink-3:#7b828a;
+  --line:#dfdcd5;
+  --accent:#0f6f5c;
+  --accent-soft:#e3efe9;
+  --warn:#a9452a;
+  --code-bg:#efeeea;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:16px; line-height:1.72;
+}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* 顶栏 */
+.top{
+  position:sticky;top:0;z-index:20;
+  display:flex;align-items:center;gap:14px;
+  padding:14px 22px;
+  background:rgba(245,244,241,.92);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.mark{
+  width:30px;height:30px;flex:none;border-radius:7px;
+  background:var(--accent);color:#fff;
+  display:grid;place-items:center;
+  font-weight:700;font-size:17px;
+}
+.brand{font-weight:650;letter-spacing:.01em}
+.brand small{display:block;font-weight:400;color:var(--ink-3);font-size:12px;letter-spacing:.06em}
+.top .spacer{flex:1}
+.top-nav{display:flex;gap:18px;font-size:14px}
+.top-nav a{color:var(--ink-2)}
+.top-nav a:hover{color:var(--accent)}
+
+/* 布局 */
+.shell{
+  display:grid;
+  grid-template-columns:232px minmax(0,1fr);
+  gap:44px;
+  max-width:1180px;
+  margin:0 auto;
+  padding:34px 22px 80px;
+}
+.side{
+  position:sticky;top:78px;align-self:start;
+  max-height:calc(100vh - 100px);overflow:auto;
+  padding-right:8px;
+}
+.side h3{
+  font-size:12px;letter-spacing:.12em;color:var(--ink-3);
+  font-weight:600;margin:0 0 10px;
+}
+.side ol{list-style:none;margin:0 0 26px;padding:0}
+.side ol li{margin:0 0 2px}
+.side ol a{
+  display:block;padding:6px 10px;border-radius:6px;
+  color:var(--ink-2);font-size:14px;line-height:1.5;
+}
+.side ol a:hover{background:#ebe9e4;text-decoration:none;color:var(--ink)}
+.side ol a .v{
+  font-variant-numeric:tabular-nums;
+  color:var(--ink-3);font-size:12px;margin-left:6px;
+}
+.side .note{
+  font-size:12.5px;color:var(--ink-3);line-height:1.6;
+  border-top:1px solid var(--line);padding-top:14px;
+}
+
+/* 内容 */
+main{min-width:0}
+.head-block{margin-bottom:34px}
+.head-block h1{
+  font-size:30px;line-height:1.25;margin:0 0 8px;font-weight:680;letter-spacing:-.01em;
+}
+.head-block p{margin:0;color:var(--ink-2);font-size:15px}
+
+section.ver{
+  padding:26px 0 30px;
+  border-top:1px solid var(--line);
+  scroll-margin-top:84px;
+}
+section.ver:first-of-type{border-top:0}
+.ver-head{
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;
+  margin:0 0 4px;
+}
+.ver-head h2{
+  font-size:21px;margin:0;font-weight:660;letter-spacing:-.005em;
+  font-variant-numeric:tabular-nums;
+}
+.badge{
+  font-size:12px;font-weight:600;
+  padding:2px 9px;border-radius:999px;
+  background:var(--accent-soft);color:var(--accent);
+  letter-spacing:.02em;
+}
+.badge.gray{background:#e8e6e0;color:var(--ink-2)}
+.when{font-size:13px;color:var(--ink-3);margin:0 0 16px;font-variant-numeric:tabular-nums}
+
+ul.log{margin:0 0 6px;padding-left:0;list-style:none;counter-reset:item}
+ul.log li{
+  counter-increment:item;
+  display:grid;grid-template-columns:26px 1fr;gap:8px;
+  padding:5px 0;align-items:start;
+}
+ul.log li::before{
+  content:counter(item);
+  color:var(--ink-3);font-size:13px;font-variant-numeric:tabular-nums;
+  text-align:right;line-height:1.8;
+}
+ul.log li > div{min-width:0}
+ul.log .k{
+  font-size:12px;font-weight:600;letter-spacing:.03em;
+  padding:1px 6px;border-radius:4px;margin-right:7px;
+  background:#e9e7e1;color:var(--ink-2);
+  white-space:nowrap;
+}
+ul.log .k.feat{background:var(--accent-soft);color:var(--accent)}
+ul.log .k.fix{background:#f4e4de;color:var(--warn)}
+ul.log .k.build{background:#e6e7ee;color:#3c4470}
+
+/* 版本对应关系表 */
+.tbl-wrap{margin:18px 0 4px}
+.tbl-label{
+  font-size:12.5px;color:var(--ink-2);font-weight:600;
+  letter-spacing:.04em;margin-bottom:8px;
+}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:13.5px}
+thead th{
+  background:#eceae4;color:var(--ink-2);font-weight:600;
+  text-align:left;white-space:nowrap;
+  padding:9px 12px;border-bottom:1px solid var(--line);
+  font-size:12.5px;
+}
+tbody td{
+  padding:9px 12px;border-bottom:1px solid #eeece7;
+  white-space:nowrap;font-variant-numeric:tabular-nums;
+}
+tbody tr:last-child td{border-bottom:0}
+tbody td:first-child{font-weight:650;color:var(--accent)}
+
+/* 通用块 */
+.block{
+  margin:34px 0 0;padding:22px 24px;
+  background:var(--surface);border:1px solid var(--line);border-radius:10px;
+  scroll-margin-top:84px;
+}
+.block h2{font-size:19px;margin:0 0 12px;font-weight:660}
+.block h3{font-size:15px;margin:20px 0 6px;font-weight:640;color:var(--ink)}
+.block p{margin:0 0 10px;color:var(--ink-2);font-size:15px}
+pre{
+  margin:10px 0 14px;padding:14px 16px;
+  background:var(--code-bg);border-radius:8px;
+  overflow-x:auto;font-size:13px;line-height:1.65;
+  font-family:ui-monospace,SFMono-Regular,"Cascadia Mono","Consolas",monospace;
+}
+pre .c{color:var(--ink-3)}
+code.inline{
+  background:var(--code-bg);padding:1px 5px;border-radius:4px;
+  font-family:ui-monospace,SFMono-Regular,"Cascadia Mono","Consolas",monospace;
+  font-size:13.5px;
+}
+.tag-row{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 14px}
+.tag-row span{
+  font-size:12.5px;padding:3px 9px;border-radius:999px;
+  border:1px solid var(--line);color:var(--ink-2);background:#faf9f6;
+}
+ul.plain{margin:0 0 10px;padding-left:20px;color:var(--ink-2);font-size:15px}
+ul.plain li{margin-bottom:7px}
+
+footer{
+  max-width:1180px;margin:0 auto;padding:0 22px 56px;
+  color:var(--ink-3);font-size:12.5px;border-top:1px solid var(--line);
+  padding-top:18px;
+}
+
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr;gap:18px;padding-top:22px}
+  .side{
+    position:static;max-height:none;overflow:visible;
+    display:flex;gap:10px;flex-wrap:wrap;padding:0;
+    border-bottom:1px solid var(--line);padding-bottom:16px;
+  }
+  .side h3{display:none}
+  .side ol{display:flex;flex-wrap:wrap;gap:6px;margin:0}
+  .side ol a{background:#eceae4;padding:5px 10px;font-size:13px}
+  .side .note{display:none}
+  .head-block h1{font-size:25px}
+  .top{padding:12px 16px}
+  .top-nav{display:none}
+}
+@media (prefers-reduced-motion:no-preference){
+  a{transition:color .15s,background-color .15s}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="mark">T</div>
+  <div class="brand">Trojan Panel 自建栈<small>silin12 fork · 更新日志</small></div>
+  <div class="spacer"></div>
+  <nav class="top-nav">
+    <a href="#v101">v1.0.1</a>
+    <a href="#v100">v1.0.0</a>
+    <a href="#custom">定制功能</a>
+    <a href="#install">安装与升级</a>
+    <a href="#issues">已知问题</a>
+  </nav>
+</header>
+
+<div class="shell">
+  <aside class="side">
+    <h3>更新日志</h3>
+    <ol>
+      <li><a href="#v101">2026.11.17 v1.0.1<span class="v">文档站</span></a></li>
+      <li><a href="#v100">2026.11.17 v1.0.0<span class="v">版本打标</span></a></li>
+      <li><a href="#custom">2026.11.16 定制功能<span class="v">无版本号</span></a></li>
+    </ol>
+    <h3>文档</h3>
+    <ol>
+      <li><a href="#install">安装与升级</a></li>
+      <li><a href="#issues">已知问题</a></li>
+      <li><a href="#repos">仓库与镜像</a></li>
+    </ol>
+    <div class="note">这是自建 fork 栈的私有更新日志，与官方 trojanpanel.github.io 无关。官方基线的改动不在此列。</div>
+  </aside>
+
+  <main>
+    <div class="head-block">
+      <h1>更新日志</h1>
+      <p>自建 fork 栈（<code class="inline">ghcr.io/silin12</code> 镜像 + 改造后的一键脚本）的版本发布记录。每个版本附版本对应关系表，写明镜像、面板、内核各层实际跑的版本。</p>
+    </div>
+
+    <!-- ===== v1.0.1 ===== -->
+    <section class="ver" id="v101">
+      <div class="ver-head">
+        <h2>2026.11.17 v1.0.1</h2>
+        <span class="badge">最新</span>
+      </div>
+      <p class="when">镜像 <code class="inline">:latest</code> / <code class="inline">:v1.0.1</code> · 脚本 <code class="inline">v1.0.1</code></p>
+
+      <ul class="log">
+        <li><div><span class="k feat">feat</span>新增自建项目文档站（本页）：更新日志、版本对应关系、安装与升级、已知问题。</div></li>
+        <li><div><span class="k feat">feat</span>面板右上角「项目文档」菜单改为指向本站，不再跳到官方文档。</div></li>
+        <li><div><span class="k build">build</span>三个镜像重新构建，同时推 <code class="inline">:latest</code> 与 <code class="inline">:v1.0.1</code>；<code class="inline">v1.0.0</code> 保持不变，作为历史版本可回退。</div></li>
+        <li><div><span class="k fix">note</span>本版后端与 core 代码与 <code class="inline">v1.0.0</code> 无差异，只有前端多了一处链接改动。</div></li>
+      </ul>
+
+      <div class="tbl-wrap">
+        <div class="tbl-label">版本对应关系</div>
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>镜像标签</th><th>Install Script</th><th>Trojan Panel</th><th>Trojan Panel UI</th><th>Trojan Panel Core</th><th>Core SDK</th><th>Xray</th><th>Trojan Go</th><th>Hysteria</th><th>Hysteria2</th><th>Caddy（NaiveProxy）</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>v1.0.1</td><td>v1.0.1</td><td>v2.3.1</td><td>v2.3.0</td><td>v2.3.1</td><td>v0.0.1</td><td>v1.8.4</td><td>v0.10.6</td><td>v1.3.4</td><td>v2.0.4</td><td>v2.6.4</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== v1.0.0 ===== -->
+    <section class="ver" id="v100">
+      <div class="ver-head">
+        <h2>2026.11.17 v1.0.0</h2>
+        <span class="badge gray">首个版本</span>
+      </div>
+      <p class="when">镜像 <code class="inline">:latest</code> 与 <code class="inline">:v1.0.0</code> 同 digest · 四仓 Release <code class="inline">v1.0.0</code></p>
+
+      <ul class="log">
+        <li><div><span class="k feat">feat</span>把散落的定制改动收敛成一个版本：三个镜像同时推 <code class="inline">:latest</code> 与 <code class="inline">:v1.0.0</code>，不再只能靠 digest 认版本。</div></li>
+        <li><div><span class="k feat">feat</span>四个仓库（trojan-panel / -ui / -core / install-script）全部发布 <code class="inline">v1.0.0</code> tag 与 Release。</div></li>
+        <li><div><span class="k feat">feat</span>一键脚本新增 <code class="inline">TP_IMAGE_TAG</code>（默认 <code class="inline">latest</code>），18 处镜像引用带上版本标签，可以按版本固定安装。</div></li>
+        <li><div><span class="k build">build</span>新增 <code class="inline">build-ghcr-v100.yml</code> 作为唯一构建入口（推 latest + v1.0.0），删除旧的只推 latest 的 <code class="inline">build-ghcr.yml</code>。</div></li>
+        <li><div><span class="k build">build</span>镜像构建：Go 1.19 编译后端、Node 16 + yarn 编译前端、Go 1.20 编译 core，内核二进制取自官方 core 镜像，<code class="inline">linux/amd64</code>。</div></li>
+      </ul>
+
+      <div class="tbl-wrap">
+        <div class="tbl-label">版本对应关系</div>
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>镜像标签</th><th>Install Script</th><th>Trojan Panel</th><th>Trojan Panel UI</th><th>Trojan Panel Core</th><th>Core SDK</th><th>Xray</th><th>Trojan Go</th><th>Hysteria</th><th>Hysteria2</th><th>Caddy（NaiveProxy）</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>v1.0.0</td><td>v1.0.0（脚本尚无 TP_IMAGE_TAG）</td><td>v2.3.1</td><td>v2.3.0</td><td>v2.3.1</td><td>v0.0.1</td><td>v1.8.4</td><td>v0.10.6</td><td>v1.3.4</td><td>v2.0.4</td><td>v2.6.4</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 定制功能 ===== -->
+    <section class="ver" id="custom">
+      <div class="ver-head">
+        <h2>2026.11.16 定制功能</h2>
+        <span class="badge gray">打标之前</span>
+      </div>
+      <p class="when">fork 官方栈后陆续加入的功能，已包含在 <code class="inline">v1.0.0</code> 与之后所有镜像里</p>
+
+      <ul class="log">
+        <li><div><span class="k feat">feat</span>节点导入 / 导出（JSON 格式），配合「文件任务」下载。</div></li>
+        <li><div><span class="k feat">feat</span>订阅短链 <code class="inline">/api/s/xxx</code>，按客户端 UA 适配 Clash.Meta / v2rayN / sing-box，未知客户端回落到 base64。</div></li>
+        <li><div><span class="k fix">fix</span>前端 nginx 放开 TLS 1.2 并补 ECDSA 套件，解决 v2rayN 拉订阅时的握手失败。</div></li>
+        <li><div><span class="k fix">fix</span>到期提醒：判定窗口改为东八区日历日（原来错用未来 24 小时）；提前 N 天提醒不再对已过期账号重复发送。</div></li>
+        <li><div><span class="k feat">feat</span>每月重置：每月 1 号 00:00 只重置 <code class="inline">role_id=3</code> 的普通用户流量。</div></li>
+        <li><div><span class="k feat">feat</span>一键脚本：按 <code class="inline">/etc/os-release</code> 识别系统；菜单循环（回车回菜单、<code class="inline">0</code>/<code class="inline">q</code> 退出）；<code class="inline">TP_IMAGE_REPO</code> 切换镜像来源；装完自动写入 <code class="inline">node_server</code>（名称「面板服务器」）。</div></li>
+        <li><div><span class="k feat">feat</span>系统设置里新增流量与到期的提醒开关、每月重置提示；邮箱页支持 SMTP 配置。</div></li>
+      </ul>
+    </section>
+
+    <!-- ===== 安装与升级 ===== -->
+    <div class="block" id="install">
+      <h2>安装与升级</h2>
+      <h3>一键安装（按版本固定）</h3>
+      <pre><span class="c"># 装 v1.0.1（当前版本，推荐）</span>
+TP_IMAGE_REPO=ghcr.io/silin12 TP_IMAGE_TAG=v1.0.1 bash &lt;(curl -fsSL https://raw.githubusercontent.com/silin12/install-script/main/install_script.sh)
+
+<span class="c"># 回退到 v1.0.0</span>
+TP_IMAGE_REPO=ghcr.io/silin12 TP_IMAGE_TAG=v1.0.0 bash &lt;(curl -fsSL https://raw.githubusercontent.com/silin12/install-script/main/install_script.sh)</pre>
+      <p><code class="inline">TP_IMAGE_TAG</code> 默认 <code class="inline">latest</code>；不传就是拉 latest。卸载或换版本时请带上与安装时相同的 tag，否则单镜像清理会提示找不到镜像。</p>
+
+      <h3>只换某个容器（不重装）</h3>
+      <pre>docker pull ghcr.io/silin12/trojan-panel-ui:v1.0.1
+docker rename trojan-panel-ui trojan-panel-ui-old
+docker run -d --name trojan-panel-ui --restart always --network=host \
+  $(docker inspect -f '{{range .Config.Env}}-e {{.}} {{end}}' trojan-panel-ui-old) \
+  $(docker inspect -f '{{range .Mounts}}-v {{.Source}}:{{.Destination}} {{end}}' trojan-panel-ui-old) \
+  ghcr.io/silin12/trojan-panel-ui:v1.0.1
+docker rm -f trojan-panel-ui-old</pre>
+
+      <h3>镜像清单</h3>
+      <div class="tag-row">
+        <span>ghcr.io/silin12/trojan-panel:latest / :v1.0.0 / :v1.0.1</span>
+        <span>ghcr.io/silin12/trojan-panel-ui:latest / :v1.0.0 / :v1.0.1</span>
+        <span>ghcr.io/silin12/trojan-panel-core:latest / :v1.0.0 / :v1.0.1</span>
+      </div>
+      <p>重建镜像：仓库 Actions → <code class="inline">Build GHCR images</code> → Run workflow。手动点一次约 2–3 分钟。</p>
+    </div>
+
+    <!-- ===== 已知问题 ===== -->
+    <div class="block" id="issues">
+      <h2>已知问题</h2>
+      <ul class="plain">
+        <li><strong>节点 REALITY 延迟 -1</strong>：私钥反推的公钥与面板显示不一致，改过 publicKey 仍连不通，现已换端口绕过，根因未定位。改动前已恢复原值。</li>
+        <li><strong>SMTP 邮件提醒未启用</strong>：四项配置留空、四个开关关闭，代码与镜像就绪，需要时在「系统邮箱设置」里填。</li>
+        <li><strong>每月重置开关未打开</strong>：代码逻辑正确（每月 1 号 00:00，仅 <code class="inline">role_id=3</code>），面板账户页的开关还没开。</li>
+        <li><strong>数据库口令曾出现在截图</strong>：建议改成新口令，并同步更新容器环境变量。</li>
+      </ul>
+    </div>
+
+    <!-- ===== 仓库与镜像 ===== -->
+    <div class="block" id="repos">
+      <h2>仓库与镜像</h2>
+      <ul class="plain">
+        <li><a href="https://github.com/silin12/trojan-panel">silin12/trojan-panel</a> — 面板后端</li>
+        <li><a href="https://github.com/silin12/trojan-panel-ui">silin12/trojan-panel-ui</a> — 面板前端</li>
+        <li><a href="https://github.com/silin12/trojan-panel-core">silin12/trojan-panel-core</a> — 节点内核管理</li>
+        <li><a href="https://github.com/silin12/install-script">silin12/install-script</a> — 一键脚本与构建流水线</li>
+      </ul>
+      <p>镜像全部在 GHCR：<code class="inline">ghcr.io/silin12/&lt;仓库名&gt;</code>。</p>
+    </div>
+  </main>
+</div>
+
+<footer>
+  Trojan Panel 自建栈更新日志 · 基线为官方 v2.3.1（后端与 core）/ v2.3.0（前端）· 最后更新 2026-11-17
+</footer>
+
+</body>
+</html>
