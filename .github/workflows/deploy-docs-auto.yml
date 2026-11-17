@@ -1,0 +1,47 @@
+name: deploy-docs-auto
+
+# 通用部署入口：以后更新文档站只需要 Run workflow 并填 payload_url + payload_sha256，
+# 不用再新建 workflow 文件（workflow 文件本身无法用 App 令牌推送）。
+
+on:
+  workflow_dispatch:
+    inputs:
+      payload_url:
+        description: 'site.tar.gz 的 CDN 地址'
+        required: true
+        default: 'https://aka.doubaocdn.com/s/fQfH7gOV4C'
+      payload_sha256:
+        description: 'site.tar.gz 的 sha256'
+        required: true
+        default: '07f15d95b479fe7fe025cc7b96f8fb16855620a1655e34de2595d27c3deae002'
+      commit_message:
+        description: 'commit message'
+        required: false
+        default: 'docs: refresh changelog site'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Fetch payload
+        run: |
+          set -e
+          curl -fsSL "${{ inputs.payload_url }}" -o /tmp/site.tar.gz
+          echo "${{ inputs.payload_sha256 }}  /tmp/site.tar.gz" | sha256sum -c -
+          tar xzf /tmp/site.tar.gz -C .
+          git status --porcelain
+      - name: Commit and push
+        run: |
+          set -e
+          git config user.name "silin12"
+          git config user.email "silin12@users.noreply.github.com"
+          git add -A
+          git commit -m "${{ inputs.commit_message }}" || echo "nothing to commit"
+          git push origin HEAD:main
