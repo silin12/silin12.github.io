@@ -221,6 +221,7 @@ footer{
   <div class="brand">Trojan Panel 自建栈<small>silin12 fork · 更新日志</small></div>
   <div class="spacer"></div>
   <nav class="top-nav">
+    <a href="#v102">v1.0.2</a>
     <a href="#v101">v1.0.1</a>
     <a href="#v100">v1.0.0</a>
     <a href="#custom">定制功能</a>
@@ -233,6 +234,7 @@ footer{
   <aside class="side">
     <h3>更新日志</h3>
     <ol>
+      <li><a href="#v102">2026.11.17 v1.0.2<span class="v">基线</span></a></li>
       <li><a href="#v101">2026.11.17 v1.0.1<span class="v">文档站</span></a></li>
       <li><a href="#v100">2026.11.17 v1.0.0<span class="v">版本打标</span></a></li>
       <li><a href="#custom">2026.11.16 定制功能<span class="v">无版本号</span></a></li>
@@ -252,11 +254,42 @@ footer{
       <p>自建 fork 栈（<code class="inline">ghcr.io/silin12</code> 镜像 + 改造后的一键脚本）的版本发布记录。每个版本附版本对应关系表，写明镜像、面板、内核各层实际跑的版本。</p>
     </div>
 
+    <!-- ===== v1.0.2 ===== -->
+    <section class="ver" id="v102">
+      <div class="ver-head">
+        <h2>2026.11.17 v1.0.2</h2>
+        <span class="badge">最新</span>
+      </div>
+      <p class="when">镜像 <code class="inline">:latest</code> / <code class="inline">:v1.0.2</code> · 脚本 <code class="inline">v1.0.2</code> · 构建入口 <code class="inline">build-ghcr-v102.yml</code></p>
+
+      <ul class="log">
+        <li><div><span class="k build">build</span>只推版本号，代码与 <code class="inline">v1.0.1</code> 完全一致：三个镜像新增 <code class="inline">:v1.0.2</code> 标签，<code class="inline">:latest</code> 跟着指向它。</div></li>
+        <li><div><span class="k feat">feat</span>定位是<b>基线版本</b>：之后的改动先落在 <code class="inline">v1.0.2</code> 镜像上验证，稳定后再打 <code class="inline">v1.0.3</code>，避免反复覆盖同一批镜像标签。</div></li>
+        <li><div><span class="k fix">keep</span><code class="inline">v1.0.1</code> 与 <code class="inline">v1.0.0</code> 镜像一律不动，作为可回退的历史版本。</div></li>
+      </ul>
+
+      <div class="tbl-wrap">
+        <div class="tbl-label">版本对应关系</div>
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>镜像标签</th><th>Install Script</th><th>Trojan Panel</th><th>Trojan Panel UI</th><th>Trojan Panel Core</th><th>Core SDK</th><th>Xray</th><th>Trojan Go</th><th>Hysteria</th><th>Hysteria2</th><th>Caddy（NaiveProxy）</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>v1.0.2</td><td>v1.0.2</td><td>v2.3.1</td><td>v2.3.0</td><td>v2.3.1</td><td>v0.0.1</td><td>v1.8.4</td><td>v0.10.6</td><td>v1.3.4</td><td>v2.0.4</td><td>v2.6.4</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
     <!-- ===== v1.0.1 ===== -->
     <section class="ver" id="v101">
       <div class="ver-head">
         <h2>2026.11.17 v1.0.1</h2>
-        <span class="badge">最新</span>
+        <span class="badge gray">已被 v1.0.2 接续</span>
       </div>
       <p class="when">镜像 <code class="inline">:latest</code> / <code class="inline">:v1.0.1</code> · 脚本 <code class="inline">v1.0.1</code> · 本站 <a href="https://silin12.github.io/">silin12.github.io</a></p>
 
@@ -341,29 +374,31 @@ footer{
     <div class="block" id="install">
       <h2>安装与升级</h2>
       <h3>一键安装（按版本固定）</h3>
-      <pre><span class="c"># 装 v1.0.1（当前版本，推荐）</span>
+      <pre><span class="c"># 装 v1.0.2（当前基线版本，推荐）</span>
+TP_IMAGE_REPO=ghcr.io/silin12 TP_IMAGE_TAG=v1.0.2 bash &lt;(curl -fsSL https://raw.githubusercontent.com/silin12/install-script/main/install_script.sh)
+
+<span class="c"># 回退到 v1.0.1 或 v1.0.0</span>
 TP_IMAGE_REPO=ghcr.io/silin12 TP_IMAGE_TAG=v1.0.1 bash &lt;(curl -fsSL https://raw.githubusercontent.com/silin12/install-script/main/install_script.sh)
 
-<span class="c"># 回退到 v1.0.0</span>
 TP_IMAGE_REPO=ghcr.io/silin12 TP_IMAGE_TAG=v1.0.0 bash &lt;(curl -fsSL https://raw.githubusercontent.com/silin12/install-script/main/install_script.sh)</pre>
       <p><code class="inline">TP_IMAGE_TAG</code> 默认 <code class="inline">latest</code>；不传就是拉 latest。卸载或换版本时请带上与安装时相同的 tag，否则单镜像清理会提示找不到镜像。</p>
 
       <h3>只换某个容器（不重装）</h3>
-      <pre>docker pull ghcr.io/silin12/trojan-panel-ui:v1.0.1
+      <pre>docker pull ghcr.io/silin12/trojan-panel-ui:v1.0.2
 docker rename trojan-panel-ui trojan-panel-ui-old
 docker run -d --name trojan-panel-ui --restart always --network=host \
   $(docker inspect -f '{{range .Config.Env}}-e {{.}} {{end}}' trojan-panel-ui-old) \
   $(docker inspect -f '{{range .Mounts}}-v {{.Source}}:{{.Destination}} {{end}}' trojan-panel-ui-old) \
-  ghcr.io/silin12/trojan-panel-ui:v1.0.1
+  ghcr.io/silin12/trojan-panel-ui:v1.0.2
 docker rm -f trojan-panel-ui-old</pre>
 
       <h3>镜像清单</h3>
       <div class="tag-row">
-        <span>ghcr.io/silin12/trojan-panel:latest / :v1.0.0 / :v1.0.1</span>
-        <span>ghcr.io/silin12/trojan-panel-ui:latest / :v1.0.0 / :v1.0.1</span>
-        <span>ghcr.io/silin12/trojan-panel-core:latest / :v1.0.0 / :v1.0.1</span>
+        <span>ghcr.io/silin12/trojan-panel:latest / :v1.0.0 / :v1.0.1 / :v1.0.2</span>
+        <span>ghcr.io/silin12/trojan-panel-ui:latest / :v1.0.0 / :v1.0.1 / :v1.0.2</span>
+        <span>ghcr.io/silin12/trojan-panel-core:latest / :v1.0.0 / :v1.0.1 / :v1.0.2</span>
       </div>
-      <p>重建镜像：仓库 Actions → <code class="inline">Build GHCR images v1.0.1</code>（<code class="inline">build-ghcr-v101.yml</code>）→ Run workflow。手动点一次约 2–3 分钟。</p>
+      <p>重建镜像：仓库 Actions → <code class="inline">Build GHCR images v1.0.2</code>（<code class="inline">build-ghcr-v102.yml</code>）→ Run workflow。手动点一次约 2–3 分钟。</p>
     </div>
 
     <!-- ===== 已知问题 ===== -->
