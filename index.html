@@ -221,6 +221,7 @@ footer{
   <div class="brand">Trojan Panel 自建栈<small>silin12 fork · 更新日志</small></div>
   <div class="spacer"></div>
   <nav class="top-nav">
+    <a href="#v103">v1.0.3</a>
     <a href="#v102">v1.0.2</a>
     <a href="#v101">v1.0.1</a>
     <a href="#v100">v1.0.0</a>
@@ -234,6 +235,7 @@ footer{
   <aside class="side">
     <h3>更新日志</h3>
     <ol>
+      <li><a href="#v103">2026.11.17 v1.0.3<span class="v">最新</span></a></li>
       <li><a href="#v102">2026.11.17 v1.0.2<span class="v">基线</span></a></li>
       <li><a href="#v101">2026.11.17 v1.0.1<span class="v">文档站</span></a></li>
       <li><a href="#v100">2026.11.17 v1.0.0<span class="v">版本打标</span></a></li>
@@ -254,11 +256,43 @@ footer{
       <p>自建 fork 栈（<code class="inline">ghcr.io/silin12</code> 镜像 + 改造后的一键脚本）的版本发布记录。每个版本附版本对应关系表，写明镜像、面板、内核各层实际跑的版本。</p>
     </div>
 
+    <!-- ===== v1.0.3 ===== -->
+    <section class="ver" id="v103">
+      <div class="ver-head">
+        <h2>2026.11.17 v1.0.3</h2>
+        <span class="badge">最新</span>
+      </div>
+      <p class="when">core 镜像 <code class="inline">:v1.0.3</code> · 脚本 <code class="inline">v1.0.3</code> · 构建入口 <code class="inline">build-ghcr-core-v240.yml</code></p>
+
+      <ul class="log">
+        <li><div><span class="k fix">fix</span>修复 <b>Mihomo / Clash Verge 连不上 REALITY 节点</b>：Xray 从 <code class="inline">v26.7.11</code> 起把 REALITY 的 <code class="inline">minClientVer</code> 默认值提到 <code class="inline">26.3.27</code>，而 Mihomo 上报 <code class="inline">1.8.2</code> 被直接拒绝，日志表现为 <code class="inline">REALITY authentication failed</code>。core 在 <code class="inline">app/xray/xray.go</code> 的空 <code class="inline">realitySettings</code> 分支补默认值 <code class="inline">1.0.0</code>，mihomo 实测 <code class="inline">REALITY Authentication: true</code>。</div></li>
+        <li><div><span class="k feat">feat</span>一键脚本菜单 <b>8 / 9 / 10</b>（Update Frontend / Backend / Core）改成比对<b>容器实际运行的镜像标签</b>与 <code class="inline">${TP_IMAGE_REPO}/&lt;仓库&gt;:${TP_IMAGE_TAG}</code>。以前是拿二进制 <code class="inline">-version</code> 跟硬编码旧版本号（v2.3.0 / v2.3.1 / v2.3.1）比，对当前部署永远判定「已是最新」而不动作；现在换 tag 就是升级，不重装。</div></li>
+        <li><div><span class="k build">build</span>core 镜像新增 <code class="inline">:v1.0.3</code> 标签，与 <code class="inline">:v2.4.0</code> / <code class="inline">:latest</code> / <code class="inline">:v1.0.2</code> 指向同一内容，digest <code class="inline">sha256:f7dd0baf…33c2ea</code>；面板与前端镜像本轮无改动，不打 v1.0.3 标签。</div></li>
+        <li><div><span class="k fix">note</span>换镜像<b>不会重写</b>已存在节点的 <code class="inline">config-*.json</code>：升级后需在面板里把每个 REALITY 节点保存一次，才会写入 <code class="inline">minClientVer</code>；新建节点自动带上。</div></li>
+      </ul>
+
+      <div class="tbl-wrap">
+        <div class="tbl-label">版本对应关系</div>
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>镜像标签</th><th>Install Script</th><th>Trojan Panel</th><th>Trojan Panel UI</th><th>Trojan Panel Core</th><th>Core SDK</th><th>Xray</th><th>Trojan Go</th><th>Hysteria</th><th>Hysteria2</th><th>Caddy（NaiveProxy）</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>v1.0.3</td><td>v1.0.3</td><td>v2.3.1</td><td>v2.3.0</td><td><b>v2.4.0</b></td><td>v0.0.1</td><td><b>v26.7.28</b></td><td>v0.10.6</td><td><b>v1.3.5</b></td><td><b>v2.14.0</b></td><td>v2.6.4</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
     <!-- ===== v1.0.2 ===== -->
     <section class="ver" id="v102">
       <div class="ver-head">
         <h2>2026.11.17 v1.0.2</h2>
-        <span class="badge">最新</span>
+        <span class="badge gray">基线</span>
       </div>
       <p class="when">镜像 <code class="inline">:latest</code> / <code class="inline">:v1.0.2</code> · 脚本 <code class="inline">v1.0.2</code> · 构建入口 <code class="inline">build-ghcr-v102.yml</code></p>
 
@@ -377,14 +411,22 @@ footer{
     <div class="block" id="install">
       <h2>安装与升级</h2>
       <h3>一键安装（按版本固定）</h3>
-      <pre><span class="c"># 装 v1.0.2（当前基线版本，推荐）</span>
+      <pre><span class="c"># 装 v1.0.3（当前推荐，core 含 REALITY minClientVer 补丁）</span>
+TP_IMAGE_REPO=ghcr.io/silin12 TP_IMAGE_TAG=v1.0.3 bash &lt;(curl -fsSL https://raw.githubusercontent.com/silin12/install-script/main/install_script.sh)
+
+<span class="c"># 退到 v1.0.2 基线 / v1.0.1 / v1.0.0</span>
 TP_IMAGE_REPO=ghcr.io/silin12 TP_IMAGE_TAG=v1.0.2 bash &lt;(curl -fsSL https://raw.githubusercontent.com/silin12/install-script/main/install_script.sh)
 
-<span class="c"># 回退到 v1.0.1 或 v1.0.0</span>
 TP_IMAGE_REPO=ghcr.io/silin12 TP_IMAGE_TAG=v1.0.1 bash &lt;(curl -fsSL https://raw.githubusercontent.com/silin12/install-script/main/install_script.sh)
 
 TP_IMAGE_REPO=ghcr.io/silin12 TP_IMAGE_TAG=v1.0.0 bash &lt;(curl -fsSL https://raw.githubusercontent.com/silin12/install-script/main/install_script.sh)</pre>
       <p><code class="inline">TP_IMAGE_TAG</code> 默认 <code class="inline">latest</code>；不传就是拉 latest。卸载或换版本时请带上与安装时相同的 tag，否则单镜像清理会提示找不到镜像。</p>
+
+      <h3>升级：菜单 8 / 9 / 10（不重装）</h3>
+      <pre><span class="c"># 目标版本写在 TP_IMAGE_TAG，进菜单后点 8 / 9 / 10</span>
+TP_IMAGE_REPO=ghcr.io/silin12 TP_IMAGE_TAG=v1.0.3 bash &lt;(curl -fsSL https://raw.githubusercontent.com/silin12/install-script/main/install_script.sh)</pre>
+      <p>8 = Update Trojan Panel Frontend，9 = Update Trojan Panel Backend，10 = Update Trojan Panel Core。脚本先 <code class="inline">docker inspect -f '{{.Config.Image}}'</code> 取容器当前镜像，与 <code class="inline">${TP_IMAGE_REPO}/&lt;仓库&gt;:${TP_IMAGE_TAG}</code> 比对，不一致才动；一致就打印「已是最新」。真正执行时会从 <code class="inline">config.ini</code> 读回 MariaDB / Redis / grpc / server 端口，<code class="inline">flushall</code> 清 Redis，<code class="inline">docker rm</code> 旧容器，拉新 tag，按原参数重建——数据库、节点配置、证书都不动。</p>
+      <p>换过 core 之后，已存在节点的 <code class="inline">config-*.json</code> 不会被重写，REALITY 节点要在面板里逐个保存一次才会带上 <code class="inline">minClientVer</code>。</p>
 
       <h3>只换某个容器（不重装）</h3>
       <pre>docker pull ghcr.io/silin12/trojan-panel-ui:v1.0.2
@@ -399,7 +441,7 @@ docker rm -f trojan-panel-ui-old</pre>
       <div class="tag-row">
         <span>ghcr.io/silin12/trojan-panel:latest / :v1.0.0 / :v1.0.1 / :v1.0.2</span>
         <span>ghcr.io/silin12/trojan-panel-ui:latest / :v1.0.0 / :v1.0.1 / :v1.0.2</span>
-        <span>ghcr.io/silin12/trojan-panel-core:latest / :v1.0.0 / :v1.0.1 / :v1.0.2 / :v2.4.0</span>
+        <span>ghcr.io/silin12/trojan-panel-core:latest / :v1.0.0 / :v1.0.1 / :v1.0.2 / :v1.0.3 / :v2.4.0</span>
       </div>
       <p>重建镜像：仓库 Actions → <code class="inline">Build GHCR images v1.0.2</code>（<code class="inline">build-ghcr-v102.yml</code>）→ Run workflow。手动点一次约 2–3 分钟。</p>
     </div>
@@ -408,7 +450,7 @@ docker rm -f trojan-panel-ui-old</pre>
     <div class="block" id="issues">
       <h2>已知问题</h2>
       <ul class="plain">
-        <li><strong>节点 REALITY 延迟 -1</strong>：私钥反推的公钥与面板显示不一致，改过 publicKey 仍连不通，现已换端口绕过，根因未定位。改动前已恢复原值。</li>
+        <li><strong>REALITY 连不上（已修复）</strong>：根因是 Xray ≥ v26.7.11 把 <code class="inline">minClientVer</code> 默认提到 <code class="inline">26.3.27</code>，Mihomo / Clash 上报 <code class="inline">1.8.2</code> 被拒；<code class="inline">v1.0.3</code> 的 core 已补默认 <code class="inline">1.0.0</code>，mihomo 实测握手成功。老节点仍需在面板里逐个保存一次。</li>
         <li><strong>SMTP 邮件提醒未启用</strong>：四项配置留空、四个开关关闭，代码与镜像就绪，需要时在「系统邮箱设置」里填。</li>
         <li><strong>每月重置开关未打开</strong>：代码逻辑正确（每月 1 号 00:00，仅 <code class="inline">role_id=3</code>），面板账户页的开关还没开。</li>
         <li><strong>数据库口令曾出现在截图</strong>：建议改成新口令，并同步更新容器环境变量。</li>
