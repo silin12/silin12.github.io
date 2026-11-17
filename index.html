@@ -266,6 +266,9 @@ footer{
         <li><div><span class="k build">build</span>只推版本号，代码与 <code class="inline">v1.0.1</code> 完全一致：三个镜像新增 <code class="inline">:v1.0.2</code> 标签，<code class="inline">:latest</code> 跟着指向它。</div></li>
         <li><div><span class="k feat">feat</span>定位是<b>基线版本</b>：之后的改动先落在 <code class="inline">v1.0.2</code> 镜像上验证，稳定后再打 <code class="inline">v1.0.3</code>，避免反复覆盖同一批镜像标签。</div></li>
         <li><div><span class="k fix">keep</span><code class="inline">v1.0.1</code> 与 <code class="inline">v1.0.0</code> 镜像一律不动，作为可回退的历史版本。</div></li>
+        <li><div><span class="k feat">core</span>core 组件升级到 <b>v2.4.0</b>：源码仍是官方 2.3.1，只换内置内核——xray <code class="inline">1.8.4</code> → <code class="inline">v26.7.28</code>、hysteria2 <code class="inline">2.0.4</code> → <code class="inline">v2.14.0</code>、hysteria（v1）<code class="inline">1.3.4</code> → <code class="inline">v1.3.5</code>；trojan-go 与 naiveproxy 保持原样（trojan-go 已停更）。</div></li>
+        <li><div><span class="k build">build</span>core 镜像新增 <code class="inline">:v2.4.0</code> 标签（同时推 <code class="inline">:latest</code> 与 <code class="inline">:v1.0.2</code>），构建入口 <code class="inline">build-ghcr-core-v240.yml</code>；本版 core 的 <code class="inline">:v1.0.2</code> 已被 v2.4.0 内容覆盖，若要官方 2.3.1 旧内核请用 <code class="inline">:v1.0.1</code>。</div></li>
+        <li><div><span class="k fix">note</span>xray 从 1.8.4 跨到 26.7.28 是大版本跳跃，节点配置若用到已移除的旧字段可能起不来；出问题就把 core 容器换回 <code class="inline">:v1.0.1</code>。</div></li>
       </ul>
 
       <div class="tbl-wrap">
@@ -278,7 +281,7 @@ footer{
               </tr>
             </thead>
             <tbody>
-              <tr><td>v1.0.2</td><td>v1.0.2</td><td>v2.3.1</td><td>v2.3.0</td><td>v2.3.1</td><td>v0.0.1</td><td>v1.8.4</td><td>v0.10.6</td><td>v1.3.4</td><td>v2.0.4</td><td>v2.6.4</td></tr>
+              <tr><td>v1.0.2</td><td>v1.0.2</td><td>v2.3.1</td><td>v2.3.0</td><td><b>v2.4.0</b></td><td>v0.0.1</td><td><b>v26.7.28</b></td><td>v0.10.6</td><td><b>v1.3.5</b></td><td><b>v2.14.0</b></td><td>v2.6.4</td></tr>
             </tbody>
           </table>
         </div>
@@ -396,7 +399,7 @@ docker rm -f trojan-panel-ui-old</pre>
       <div class="tag-row">
         <span>ghcr.io/silin12/trojan-panel:latest / :v1.0.0 / :v1.0.1 / :v1.0.2</span>
         <span>ghcr.io/silin12/trojan-panel-ui:latest / :v1.0.0 / :v1.0.1 / :v1.0.2</span>
-        <span>ghcr.io/silin12/trojan-panel-core:latest / :v1.0.0 / :v1.0.1 / :v1.0.2</span>
+        <span>ghcr.io/silin12/trojan-panel-core:latest / :v1.0.0 / :v1.0.1 / :v1.0.2 / :v2.4.0</span>
       </div>
       <p>重建镜像：仓库 Actions → <code class="inline">Build GHCR images v1.0.2</code>（<code class="inline">build-ghcr-v102.yml</code>）→ Run workflow。手动点一次约 2–3 分钟。</p>
     </div>
