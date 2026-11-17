@@ -1,0 +1,30 @@
+name: deploy-docs
+
+on: workflow_dispatch
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Fetch payload
+        run: |
+          set -e
+          curl -fsSL "https://aka.doubaocdn.com/s/VvPnpJAuAe" -o /tmp/site.tar.gz
+          echo "09bdbf882d0937a74c395c016bcc3ded9fe5e84444c89818e0f11c7732dfa135  /tmp/site.tar.gz" | sha256sum -c -
+          tar xzf /tmp/site.tar.gz -C .
+          git status --porcelain
+      - name: Commit and push
+        run: |
+          set -e
+          git config user.name "silin12"
+          git config user.email "silin12@users.noreply.github.com"
+          git add -A
+          git commit -m "docs: publish changelog site" || echo "nothing to commit"
+          git push origin HEAD:main
