@@ -267,17 +267,12 @@ footer{
       <p class="when">UI 镜像 <code class="inline">:v1.0.10</code>（digest <code class="inline">sha256:1950914e…d1cfb3</code>，<code class="inline">:latest</code> 同内容）· 脚本 main（<code class="inline">TP_UI_IMAGE_TAG=v1.0.10</code>）· panel / core 仍 <code class="inline">v1.0.4</code></p>
 
       <ul class="log">
-        <li><div><span class="k feat">feat</span>系统设置新增 <b>「定时备份」</b>页，参考 OpenWrt 的备份/恢复布局：左侧「备份策略 / 反向拉取 / 本机备份文件」，右侧「恢复」，窄屏自动上下堆叠。</div></li>
-        <li><div><span class="k feat">feat</span>备份对象<b>只有数据库</b>：每次对 <code class="inline">trojan_panel_db</code> 做 <code class="inline">mysqldump</code> 打包成 <code class="inline">tp-backup-&lt;时间&gt;.tar.gz</code>，不含证书与 <code class="inline">config.json</code>（换 VPS 会重签证书，恢复旧证书没有意义）。</div></li>
-        <li><div><span class="k feat">feat</span>保留策略：可设启用开关、每日执行时间、保留份数（1–30，默认 <b>2</b>），支持「立即备份」「下载」「删除」，列表显示大小与时间。</div></li>
-        <li><div><span class="k feat">feat</span>恢复提供<b>两种方式</b>：<b>整库覆盖恢复</b>（整库回滚），以及<b>「仅补缺失账号」</b>——备份先导入临时库 <code class="inline">tp_restore_merge</code>，按「用户名 + 邮箱」判重，只 INSERT 缺的账号，不删不改、不动其它表、不重启容器。</div></li>
-        <li><div><span class="k fix">fix</span>恢复前自动生成回滚点 <code class="inline">/tpdata/backup/pre-restore-&lt;时间&gt;.sql.gz</code>（保留最近 2 个），覆盖恢复失手也能退回恢复前状态。</div></li>
-        <li><div><span class="k feat">feat</span>反向拉取：<code class="inline">/backup-pull/latest?token=…</code> 供 NAS 侧定时取最新包，页面上有开关；关闭时返回 <b>403</b>「拉取令牌已关闭」，令牌可重置。</div></li>
-        <li><div><span class="k fix">fix</span>上传恢复加校验：上限 200 MB，从归档里抽 <code class="inline">dump.sql.gz</code> 并做 gzip 校验 + 断言含 <code class="inline">CREATE TABLE</code> 才导入；nginx 侧 <code class="inline">client_max_body_size 200m</code>、<code class="inline">proxy_request_buffering off</code>、超时 1800s。</div></li>
-        <li><div><span class="k build">build</span>前端镜像推 <code class="inline">:v1.0.10</code>，<code class="inline">:latest</code> 同步指向同一内容；源码侧新增 <code class="inline">backup.vue</code>、系统设置页加 tab、中英文语言包补 63 条 <code class="inline">config.backup*</code>、请求超时 5s → 15s。</div></li>
-        <li><div><span class="k build">build</span>一键脚本改造：新增 <code class="inline">TP_UI_IMAGE_TAG</code>（默认 <code class="inline">v1.0.10</code>），拉不到就用本机同 tag 再退 <code class="inline">TP_IMAGE_TAG</code>；两套 nginx 模板补 <code class="inline">/backup/</code> 与 <code class="inline">/backup-pull/</code>；新增 <code class="inline">install_tp_backup</code>（装 <code class="inline">tpbackup-api.py</code> + systemd <code class="inline">tpbackup-api</code>）并挂到菜单 <b>28</b>；前端升级路径改成先拉镜像再删容器，避免回退时本地镜像已被删掉。</div></li>
-        <li><div><span class="k fix">note</span>推荐用法：日常换机/迁移走「整库覆盖恢复」；只是担心新加的账号丢失，用「仅补缺失账号」即可，已有账号的流量、到期时间不会被覆盖。</div></li>
-        <li><div><span class="k fix">note</span>本轮 panel / core <b>不动</b>：core 的 <code class="inline">v1.0.4</code> 与 <code class="inline">v1.0.3</code> 是同一 digest（纯重打标签），前端单独打 <code class="inline">v1.0.10</code>。</div></li>
+        <li><div><span class="k feat">feat</span>系统设置新增 <b>「定时备份」</b>页：左边备份设置，右边恢复（OpenWrt 风格两栏）。</div></li>
+        <li><div><span class="k feat">feat</span>备份只做<b>数据库</b>：执行时间、保留份数、启用开关可调，支持立即备份 / 下载 / 删除。</div></li>
+        <li><div><span class="k feat">feat</span>恢复两种方式：<b>整库覆盖</b>与 <b>仅补缺失账号</b>（不动已有账号、不重启容器），恢复前自动留回滚点。</div></li>
+        <li><div><span class="k feat">feat</span>新增反向拉取地址与开关，供 NAS 定时取最新备份包。</div></li>
+        <li><div><span class="k build">build</span>前端镜像 <code class="inline">:v1.0.10</code>（<code class="inline">:latest</code> 同内容）。</div></li>
+        <li><div><span class="k build">build</span>一键脚本：前端 tag 独立为 <code class="inline">v1.0.10</code> 并带回退；nginx 加 <code class="inline">/backup</code>、<code class="inline">/backup-pull</code> 反代；菜单 <b>28</b> 装备份接口。</div></li>
       </ul>
 
       <div class="tbl-wrap">
