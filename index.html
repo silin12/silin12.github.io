@@ -222,6 +222,7 @@ footer{
   <div class="spacer"></div>
   <nav class="top-nav">
     <a href="#v1010">v1.0.10</a>
+    <a href="#v104">v1.0.4</a>
     <a href="#v103">v1.0.3</a>
     <a href="#v102">v1.0.2</a>
     <a href="#v101">v1.0.1</a>
@@ -237,7 +238,8 @@ footer{
     <h3>更新日志</h3>
     <ol>
       <li><a href="#v1010">2026.11.20 v1.0.10<span class="v">最新</span></a></li>
-      <li><a href="#v103">2026.11.17 v1.0.3<span class="v">上一版</span></a></li>
+      <li><a href="#v104">2026.11.19 v1.0.4<span class="v">后端</span></a></li>
+      <li><a href="#v103">2026.11.17 v1.0.3<span class="v">历史</span></a></li>
       <li><a href="#v102">2026.11.17 v1.0.2<span class="v">基线</span></a></li>
       <li><a href="#v101">2026.11.17 v1.0.1<span class="v">文档站</span></a></li>
       <li><a href="#v100">2026.11.17 v1.0.0<span class="v">版本打标</span></a></li>
@@ -258,13 +260,49 @@ footer{
       <p>自建 fork 栈（<code class="inline">ghcr.io/silin12</code> 镜像 + 改造后的一键脚本）的版本发布记录。每次改动都会整理成一条记录写在这里，附版本对应关系表，写明镜像、面板、内核各层实际跑的版本。</p>
     </div>
 
+    <!-- ===== v1.0.4 ===== -->
+    <section class="ver" id="v104">
+      <div class="ver-head">
+        <h2>2026.11.19 v1.0.4</h2>
+        <span class="badge gray">后端 + 脚本</span>
+      </div>
+      <p class="when">三件套镜像统一 <code class="inline">:v1.0.4</code> · 脚本 <code class="inline">v1.0.4</code>（默认 <code class="inline">TP_IMAGE_TAG=v1.0.4</code>）</p>
+
+      <ul class="log">
+        <li><div><span class="k feat">feat</span>镜像统一到 <b>v1.0.4</b>（ui / panel / core），脚本默认标签同步 <code class="inline">v1.0.4</code>。</div></li>
+        <li><div><span class="k feat">feat</span>订阅链接恢复旧格式 <code class="inline">/api/auth/subscribe/&lt;base64(pass)&gt;</code>，老客户端迁移面板后链接不变；新版按 <code class="inline">?format=</code> 与 UA 分流仍可用。</div></li>
+        <li><div><span class="k feat">feat</span>服务器列表新增<b>白名单状态列</b>（通=绿勾 / 未同步=红叉），「导出」旁加手动刷新白名单按钮。</div></li>
+        <li><div><span class="k fix">fix</span><b>DB Guard 密码不再硬编码</b>：改为从 panel / core 容器环境变量 <code class="inline">mariadb_pas</code> 实时读取，修重装后白名单为空、子机连不上 9507/6378。</div></li>
+        <li><div><span class="k feat">feat</span>菜单 <b>25</b> 版本查询改为实时读 GHCR 最新 tag + 已装镜像 tag，不再写死。</div></li>
+        <li><div><span class="k feat">feat</span>菜单 <b>27</b> 新增 BBRv3 内核（XanMod + 清华源），不再提供 BBRv1。</div></li>
+        <li><div><span class="k feat">feat</span>通讯防火墙只管 MariaDB 9507 与 Redis 6378，面板 8888 与节点端口不受影响。</div></li>
+        <li><div><span class="k fix">fix</span>新增 <code class="inline">TP_IMAGE_TAG=auto</code> 盲选本系列最高 <code class="inline">v1.0.x</code>，并修掉把上游 <code class="inline">v2.4.0</code> 误判为最新版本的问题。</div></li>
+      </ul>
+
+      <div class="tbl-wrap">
+        <div class="tbl-label">版本对应关系</div>
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>镜像标签</th><th>Install Script</th><th>Trojan Panel</th><th>Trojan Panel UI</th><th>Trojan Panel Core</th><th>Core SDK</th><th>Xray</th><th>Trojan Go</th><th>Hysteria</th><th>Hysteria2</th><th>Caddy（NaiveProxy）</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>v1.0.4</td><td>v1.0.4</td><td>v1.0.4</td><td>v1.0.4</td><td>v1.0.4</td><td>v0.0.1</td><td>v26.7.28</td><td>v0.10.6</td><td>v1.3.5</td><td>v2.14.0</td><td>v2.6.4</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
     <!-- ===== v1.0.10 ===== -->
     <section class="ver" id="v1010">
       <div class="ver-head">
         <h2>2026.11.20 前端 v1.0.10</h2>
         <span class="badge">最新</span>
       </div>
-      <p class="when">UI 镜像 <code class="inline">:v1.0.10</code>（digest <code class="inline">sha256:1950914e…d1cfb3</code>，<code class="inline">:latest</code> 同内容）· 脚本 main（<code class="inline">TP_UI_IMAGE_TAG=v1.0.10</code>）· panel / core 仍 <code class="inline">v1.0.4</code></p>
+      <p class="when">UI 镜像 <code class="inline">:v1.0.10</code>（digest <code class="inline">sha256:1950914e…d1cfb3</code>，<code class="inline">:latest</code> 同内容）· 脚本 <code class="inline">v1.0.4</code>（<code class="inline">TP_UI_IMAGE_TAG=v1.0.10</code>）· panel / core 仍 <code class="inline">v1.0.4</code></p>
 
       <ul class="log">
         <li><div><span class="k feat">feat</span>系统设置新增 <b>「定时备份」</b>页：左边备份设置，右边恢复（OpenWrt 风格两栏）。</div></li>
@@ -276,7 +314,7 @@ footer{
       </ul>
 
       <div class="tbl-wrap">
-        <div class="tbl-label">版本对应关系（本行合并两个标签：后端 <code class="inline">v1.0.4</code>，前端 <code class="inline">v1.0.10</code>）</div>
+        <div class="tbl-label">版本对应关系（安装脚本 v1.0.4：后端与内核 v1.0.4，前端单独 v1.0.10）</div>
         <div class="scroll">
           <table>
             <thead>
@@ -285,7 +323,7 @@ footer{
               </tr>
             </thead>
             <tbody>
-              <tr><td>v1.0.4 + v1.0.10</td><td>main</td><td>v1.0.4</td><td><b>v1.0.10</b></td><td>v1.0.4</td><td>v0.0.1</td><td>v26.7.28</td><td>v0.10.6</td><td>v1.3.5</td><td>v2.14.0</td><td>v2.6.4</td></tr>
+              <tr><td>v1.0.4</td><td>v1.0.4</td><td>v1.0.4</td><td><b>v1.0.10</b></td><td>v1.0.4</td><td>v0.0.1</td><td>v26.7.28</td><td>v0.10.6</td><td>v1.3.5</td><td>v2.14.0</td><td>v2.6.4</td></tr>
             </tbody>
           </table>
         </div>
@@ -296,7 +334,7 @@ footer{
     <section class="ver" id="v103">
       <div class="ver-head">
         <h2>2026.11.17 v1.0.3</h2>
-        <span class="badge gray">上一版</span>
+        <span class="badge gray">历史</span>
       </div>
       <p class="when">core 镜像 <code class="inline">:v1.0.3</code> · 脚本 <code class="inline">v1.0.3</code> · 构建入口 <code class="inline">build-ghcr-core-v240.yml</code></p>
 
