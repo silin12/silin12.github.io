@@ -221,6 +221,7 @@ footer{
   <div class="brand">Trojan Panel 自建栈<small>silin12 fork · 更新日志</small></div>
   <div class="spacer"></div>
   <nav class="top-nav">
+    <a href="#v1010">v1.0.10</a>
     <a href="#v103">v1.0.3</a>
     <a href="#v102">v1.0.2</a>
     <a href="#v101">v1.0.1</a>
@@ -235,7 +236,8 @@ footer{
   <aside class="side">
     <h3>更新日志</h3>
     <ol>
-      <li><a href="#v103">2026.11.17 v1.0.3<span class="v">最新</span></a></li>
+      <li><a href="#v1010">2026.11.20 v1.0.10<span class="v">最新</span></a></li>
+      <li><a href="#v103">2026.11.17 v1.0.3<span class="v">上一版</span></a></li>
       <li><a href="#v102">2026.11.17 v1.0.2<span class="v">基线</span></a></li>
       <li><a href="#v101">2026.11.17 v1.0.1<span class="v">文档站</span></a></li>
       <li><a href="#v100">2026.11.17 v1.0.0<span class="v">版本打标</span></a></li>
@@ -253,14 +255,53 @@ footer{
   <main>
     <div class="head-block">
       <h1>更新日志</h1>
-      <p>自建 fork 栈（<code class="inline">ghcr.io/silin12</code> 镜像 + 改造后的一键脚本）的版本发布记录。每个版本附版本对应关系表，写明镜像、面板、内核各层实际跑的版本。</p>
+      <p>自建 fork 栈（<code class="inline">ghcr.io/silin12</code> 镜像 + 改造后的一键脚本）的版本发布记录。每次改动都会整理成一条记录写在这里，附版本对应关系表，写明镜像、面板、内核各层实际跑的版本。</p>
     </div>
+
+    <!-- ===== v1.0.10 ===== -->
+    <section class="ver" id="v1010">
+      <div class="ver-head">
+        <h2>2026.11.20 前端 v1.0.10</h2>
+        <span class="badge">最新</span>
+      </div>
+      <p class="when">UI 镜像 <code class="inline">:v1.0.10</code>（digest <code class="inline">sha256:1950914e…d1cfb3</code>，<code class="inline">:latest</code> 同内容）· 脚本 main（<code class="inline">TP_UI_IMAGE_TAG=v1.0.10</code>）· panel / core 仍 <code class="inline">v1.0.4</code></p>
+
+      <ul class="log">
+        <li><div><span class="k feat">feat</span>系统设置新增 <b>「定时备份」</b>页，参考 OpenWrt 的备份/恢复布局：左侧「备份策略 / 反向拉取 / 本机备份文件」，右侧「恢复」，窄屏自动上下堆叠。</div></li>
+        <li><div><span class="k feat">feat</span>备份对象<b>只有数据库</b>：每次对 <code class="inline">trojan_panel_db</code> 做 <code class="inline">mysqldump</code> 打包成 <code class="inline">tp-backup-&lt;时间&gt;.tar.gz</code>，不含证书与 <code class="inline">config.json</code>（换 VPS 会重签证书，恢复旧证书没有意义）。</div></li>
+        <li><div><span class="k feat">feat</span>保留策略：可设启用开关、每日执行时间、保留份数（1–30，默认 <b>2</b>），支持「立即备份」「下载」「删除」，列表显示大小与时间。</div></li>
+        <li><div><span class="k feat">feat</span>恢复提供<b>两种方式</b>：<b>整库覆盖恢复</b>（整库回滚），以及<b>「仅补缺失账号」</b>——备份先导入临时库 <code class="inline">tp_restore_merge</code>，按「用户名 + 邮箱」判重，只 INSERT 缺的账号，不删不改、不动其它表、不重启容器。</div></li>
+        <li><div><span class="k fix">fix</span>恢复前自动生成回滚点 <code class="inline">/tpdata/backup/pre-restore-&lt;时间&gt;.sql.gz</code>（保留最近 2 个），覆盖恢复失手也能退回恢复前状态。</div></li>
+        <li><div><span class="k feat">feat</span>反向拉取：<code class="inline">/backup-pull/latest?token=…</code> 供 NAS 侧定时取最新包，页面上有开关；关闭时返回 <b>403</b>「拉取令牌已关闭」，令牌可重置。</div></li>
+        <li><div><span class="k fix">fix</span>上传恢复加校验：上限 200 MB，从归档里抽 <code class="inline">dump.sql.gz</code> 并做 gzip 校验 + 断言含 <code class="inline">CREATE TABLE</code> 才导入；nginx 侧 <code class="inline">client_max_body_size 200m</code>、<code class="inline">proxy_request_buffering off</code>、超时 1800s。</div></li>
+        <li><div><span class="k build">build</span>前端镜像推 <code class="inline">:v1.0.10</code>，<code class="inline">:latest</code> 同步指向同一内容；源码侧新增 <code class="inline">backup.vue</code>、系统设置页加 tab、中英文语言包补 63 条 <code class="inline">config.backup*</code>、请求超时 5s → 15s。</div></li>
+        <li><div><span class="k build">build</span>一键脚本改造：新增 <code class="inline">TP_UI_IMAGE_TAG</code>（默认 <code class="inline">v1.0.10</code>），拉不到就用本机同 tag 再退 <code class="inline">TP_IMAGE_TAG</code>；两套 nginx 模板补 <code class="inline">/backup/</code> 与 <code class="inline">/backup-pull/</code>；新增 <code class="inline">install_tp_backup</code>（装 <code class="inline">tpbackup-api.py</code> + systemd <code class="inline">tpbackup-api</code>）并挂到菜单 <b>28</b>；前端升级路径改成先拉镜像再删容器，避免回退时本地镜像已被删掉。</div></li>
+        <li><div><span class="k fix">note</span>推荐用法：日常换机/迁移走「整库覆盖恢复」；只是担心新加的账号丢失，用「仅补缺失账号」即可，已有账号的流量、到期时间不会被覆盖。</div></li>
+        <li><div><span class="k fix">note</span>本轮 panel / core <b>不动</b>：core 的 <code class="inline">v1.0.4</code> 与 <code class="inline">v1.0.3</code> 是同一 digest（纯重打标签），前端单独打 <code class="inline">v1.0.10</code>。</div></li>
+      </ul>
+
+      <div class="tbl-wrap">
+        <div class="tbl-label">版本对应关系（本行合并两个标签：后端 <code class="inline">v1.0.4</code>，前端 <code class="inline">v1.0.10</code>）</div>
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>镜像标签</th><th>Install Script</th><th>Trojan Panel</th><th>Trojan Panel UI</th><th>Trojan Panel Core</th><th>Core SDK</th><th>Xray</th><th>Trojan Go</th><th>Hysteria</th><th>Hysteria2</th><th>Caddy（NaiveProxy）</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>v1.0.4 + v1.0.10</td><td>main</td><td>v1.0.4</td><td><b>v1.0.10</b></td><td>v1.0.4</td><td>v0.0.1</td><td>v26.7.28</td><td>v0.10.6</td><td>v1.3.5</td><td>v2.14.0</td><td>v2.6.4</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
     <!-- ===== v1.0.3 ===== -->
     <section class="ver" id="v103">
       <div class="ver-head">
         <h2>2026.11.17 v1.0.3</h2>
-        <span class="badge">最新</span>
+        <span class="badge gray">上一版</span>
       </div>
       <p class="when">core 镜像 <code class="inline">:v1.0.3</code> · 脚本 <code class="inline">v1.0.3</code> · 构建入口 <code class="inline">build-ghcr-core-v240.yml</code></p>
 
@@ -411,21 +452,24 @@ footer{
     <div class="block" id="install">
       <h2>安装与升级</h2>
       <h3>一键安装（按版本固定）</h3>
-      <pre><span class="c"># 装 v1.0.3（当前推荐，core 含 REALITY minClientVer 补丁）</span>
-TP_IMAGE_REPO=ghcr.io/silin12 TP_IMAGE_TAG=v1.0.3 bash &lt;(curl -fsSL https://raw.githubusercontent.com/silin12/install-script/main/install_script.sh)
+      <pre><span class="c"># 装最新：后端/内核 v1.0.4 + 前端 v1.0.10（含定时备份与恢复页）</span>
+TP_IMAGE_REPO=ghcr.io/silin12 TP_IMAGE_TAG=v1.0.4 TP_UI_IMAGE_TAG=v1.0.10 bash &lt;(curl -fsSL https://raw.githubusercontent.com/silin12/install-script/main/install_script.sh)
 
-<span class="c"># 退到 v1.0.2 基线 / v1.0.1 / v1.0.0</span>
-TP_IMAGE_REPO=ghcr.io/silin12 TP_IMAGE_TAG=v1.0.2 bash &lt;(curl -fsSL https://raw.githubusercontent.com/silin12/install-script/main/install_script.sh)
+<span class="c"># 只把前端退回 v1.0.4（没有定时备份页）</span>
+TP_IMAGE_REPO=ghcr.io/silin12 TP_IMAGE_TAG=v1.0.4 TP_UI_IMAGE_TAG=v1.0.4 bash &lt;(curl -fsSL https://raw.githubusercontent.com/silin12/install-script/main/install_script.sh)
+
+<span class="c"># 退到 v1.0.2 基线 / v1.0.1 / v1.0.0（前端同样要指 v1.0.4 以下）</span>
+TP_IMAGE_REPO=ghcr.io/silin12 TP_IMAGE_TAG=v1.0.2 TP_UI_IMAGE_TAG=v1.0.4 bash &lt;(curl -fsSL https://raw.githubusercontent.com/silin12/install-script/main/install_script.sh)
 
 TP_IMAGE_REPO=ghcr.io/silin12 TP_IMAGE_TAG=v1.0.1 bash &lt;(curl -fsSL https://raw.githubusercontent.com/silin12/install-script/main/install_script.sh)
 
 TP_IMAGE_REPO=ghcr.io/silin12 TP_IMAGE_TAG=v1.0.0 bash &lt;(curl -fsSL https://raw.githubusercontent.com/silin12/install-script/main/install_script.sh)</pre>
-      <p><code class="inline">TP_IMAGE_TAG</code> 默认 <code class="inline">latest</code>；不传就是拉 latest。卸载或换版本时请带上与安装时相同的 tag，否则单镜像清理会提示找不到镜像。</p>
+      <p><code class="inline">TP_IMAGE_TAG</code> 默认 <code class="inline">v1.0.4</code>（panel / core），<code class="inline">TP_UI_IMAGE_TAG</code> 默认 <code class="inline">v1.0.10</code>（前端），两个变量可分别指定。前端拉不到 GHCR 上的 tag 时，脚本会先用本机同 tag 的镜像，再退到 <code class="inline">TP_IMAGE_TAG</code>，不会把界面直接退回旧版。卸载或换版本时请带上与安装时相同的 tag，否则单镜像清理会提示找不到镜像。</p>
 
       <h3>升级：菜单 8 / 9 / 10（不重装）</h3>
-      <pre><span class="c"># 目标版本写在 TP_IMAGE_TAG，进菜单后点 8 / 9 / 10</span>
-TP_IMAGE_REPO=ghcr.io/silin12 TP_IMAGE_TAG=v1.0.3 bash &lt;(curl -fsSL https://raw.githubusercontent.com/silin12/install-script/main/install_script.sh)</pre>
-      <p>8 = Update Trojan Panel Frontend，9 = Update Trojan Panel Backend，10 = Update Trojan Panel Core。脚本先 <code class="inline">docker inspect -f '{{.Config.Image}}'</code> 取容器当前镜像，与 <code class="inline">${TP_IMAGE_REPO}/&lt;仓库&gt;:${TP_IMAGE_TAG}</code> 比对，不一致才动；一致就打印「已是最新」。真正执行时会从 <code class="inline">config.ini</code> 读回 MariaDB / Redis / grpc / server 端口，<code class="inline">flushall</code> 清 Redis，<code class="inline">docker rm</code> 旧容器，拉新 tag，按原参数重建——数据库、节点配置、证书都不动。</p>
+      <pre><span class="c"># 目标版本写在 TP_IMAGE_TAG / TP_UI_IMAGE_TAG，进菜单后点 8 / 9 / 10</span>
+TP_IMAGE_REPO=ghcr.io/silin12 TP_IMAGE_TAG=v1.0.4 TP_UI_IMAGE_TAG=v1.0.10 bash &lt;(curl -fsSL https://raw.githubusercontent.com/silin12/install-script/main/install_script.sh)</pre>
+      <p>8 = Update Trojan Panel Frontend（比对 <code class="inline">TP_UI_IMAGE_TAG</code>），9 = Update Trojan Panel Backend，10 = Update Trojan Panel Core。脚本先 <code class="inline">docker inspect -f '{{.Config.Image}}'</code> 取容器当前镜像，与 <code class="inline">${TP_IMAGE_REPO}/&lt;仓库&gt;:${TP_IMAGE_TAG}</code> 比对，不一致才动；一致就打印「已是最新」。真正执行时会从 <code class="inline">config.ini</code> 读回 MariaDB / Redis / grpc / server 端口，<code class="inline">flushall</code> 清 Redis，<code class="inline">docker rm</code> 旧容器，拉新 tag，按原参数重建——数据库、节点配置、证书都不动。</p>
       <p>换过 core 之后，已存在节点的 <code class="inline">config-*.json</code> 不会被重写，REALITY 节点要在面板里逐个保存一次才会带上 <code class="inline">minClientVer</code>。</p>
 
       <h3>只换某个容器（不重装）</h3>
@@ -439,11 +483,11 @@ docker rm -f trojan-panel-ui-old</pre>
 
       <h3>镜像清单</h3>
       <div class="tag-row">
-        <span>ghcr.io/silin12/trojan-panel:latest / :v1.0.0 / :v1.0.1 / :v1.0.2</span>
-        <span>ghcr.io/silin12/trojan-panel-ui:latest / :v1.0.0 / :v1.0.1 / :v1.0.2</span>
-        <span>ghcr.io/silin12/trojan-panel-core:latest / :v1.0.0 / :v1.0.1 / :v1.0.2 / :v1.0.3 / :v2.4.0</span>
+        <span>ghcr.io/silin12/trojan-panel:latest / :v1.0.0 / :v1.0.1 / :v1.0.2 / :v1.0.3 / :v1.0.4</span>
+        <span>ghcr.io/silin12/trojan-panel-ui:latest / :v1.0.0 … :v1.0.4 / :v1.0.10</span>
+        <span>ghcr.io/silin12/trojan-panel-core:latest / :v1.0.0 / :v1.0.1 / :v1.0.2 / :v2.4.0 / :v1.0.3 / :v1.0.4</span>
       </div>
-      <p>重建镜像：仓库 Actions → <code class="inline">Build GHCR images v1.0.2</code>（<code class="inline">build-ghcr-v102.yml</code>）→ Run workflow。手动点一次约 2–3 分钟。</p>
+      <p>重建镜像：后端 / core 走各仓库 Actions 里的构建 workflow 手动 Run；前端 <code class="inline">v1.0.10</code> 是本地构建后直接推送（<code class="inline">NODE_OPTIONS=--openssl-legacy-provider npm run build</code> → <code class="inline">docker build</code> → <code class="inline">docker push</code>），不依赖 Actions。</p>
     </div>
 
     <!-- ===== 已知问题 ===== -->
@@ -472,7 +516,7 @@ docker rm -f trojan-panel-ui-old</pre>
 </div>
 
 <footer>
-  Trojan Panel 自建栈更新日志 · 基线为官方 v2.3.1（后端与 core）/ v2.3.0（前端）· 最后更新 2026-11-17
+  Trojan Panel 自建栈更新日志 · 基线为官方 v2.3.1（后端与 core）/ v2.3.0（前端）· 最后更新 2026-11-20
 </footer>
 
 </body>
